@@ -1,74 +1,80 @@
-import { createStore } from "vuex";
-import { obtenerTareas, crearTarea } from "@/services/tareaService";
+import { createStore } from 'vuex';
+import {
+  getTasks,
+  createTask,
+  updateTask,
+  deleteTaskAPI,
+  toggleCompletedAPI,
+} from '@/services/tasksService';
 
 export default createStore({
   state: {
-    tareas: [],
+    tasks: [],
   },
   mutations: {
-    setTareas(state, tareas) {
-      state.tareas = tareas.map((t) => ({
+    setTasks(state, tasks) {
+      state.tasks = tasks.map((t) => ({
         id: t.id,
-        texto: t.title,
-        completada: t.completed,
-        editando: false, // <- Para controlar el modo de edición
+        text: t.text,
+        completed: t.completed,
+        editing: false,
       }));
     },
-    agregarTarea(state, tarea) {
-      state.tareas.unshift({
-        id: tarea.id,
-        texto: tarea.title,
-        completada: tarea.completed,
-        editando: false,
+    addTask(state, task) {
+      state.tasks.unshift({
+        id: task.id,
+        text: task.text,
+        completed: task.completed,
+        editing: false,
       });
     },
-    toggleCompletada(state, id) {
-      const tarea = state.tareas.find((t) => t.id === id);
-      if (tarea) tarea.completada = !tarea.completada;
+    toggleCompleted(state, id) {
+      const task = state.tasks.find((t) => t.id === id);
+      if (task) task.completed = !task.completed;
     },
-    eliminarTarea(state, id) {
-      state.tareas = state.tareas.filter((t) => t.id !== id);
+    removeTask(state, id) {
+      state.tasks = state.tasks.filter((t) => t.id !== id);
     },
-    editarTarea(state, id) {
-      const tarea = state.tareas.find((t) => t.id === id);
-      if (tarea) tarea.editando = true;
+    editTask(state, id) {
+      const task = state.tasks.find((t) => t.id === id);
+      if (task) task.editing = true;
     },
-    guardarTarea(state, { id, nuevoTexto }) {
-      const tarea = state.tareas.find((t) => t.id === id);
-      if (tarea) {
-        tarea.texto = nuevoTexto;
-        tarea.editando = false;
+    saveTask(state, { id, newText }) {
+      const task = state.tasks.find((t) => t.id === id);
+      if (task) {
+        task.text = newText;
+        task.editing = false;
       }
     },
   },
   actions: {
-    async cargarTareas({ commit }) {
-      const res = await obtenerTareas();
-      commit("setTareas", res.data);
+    async listTasks({ commit }) {
+      const res = await getTasks();
+      commit('setTasks', res.data);
     },
-    async agregarTarea({ commit }, texto) {
-      const res = await crearTarea(texto);
-      commit("agregarTarea", res.data);
+    async addTask({ commit }, text) {
+      const res = await createTask(text);
+      commit('addTask', res.data);
     },
-    toggleCompletada({ commit }, id) {
-      commit("toggleCompletada", id);
+    async toggleCompleted({ commit }, id) {
+      await toggleCompletedAPI(id);
+      commit('toggleCompleted', id);
     },
-    eliminarTarea({ commit }, id) {
-      commit("eliminarTarea", id);
+    async removeTask({ commit }, id) {
+      await deleteTaskAPI(id);
+      commit('removeTask', id);
     },
-    editarTarea({ commit }, id) {
-      commit("editarTarea", id);
+    async saveTask({ commit }, { id, newText }) {
+      await updateTask(id, newText);
+      commit('saveTask', { id, newText });
     },
-    guardarTarea({ commit }, payload) {
-      commit("guardarTarea", payload);
+    editTask({ commit }, id) {
+      commit('editTask', id);
     },
   },
   getters: {
-    tareas(state) {
-      return state.tareas;
-    },
-    totalTareas(state) {
-      return state.tareas.length;
+    tasks(state) {
+      return state.tasks;
     },
   },
 });

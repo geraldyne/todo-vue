@@ -1,12 +1,8 @@
 // src/router/index.js
-import { createRouter, createWebHistory } from "vue-router";
-import TareasView from "@/views/TareasView.vue";
-import AcercaDeView from "@/views/AcercaDeView.vue";
+import { createRouter, createWebHistory } from 'vue-router';
+import TasksView from '@/views/TasksView.vue';
 
-const routes = [
-  { path: "/", name: "Tareas", component: TareasView },
-  { path: "/acerca", name: "Acerca", component: AcercaDeView },
-];
+const routes = [{ path: '/', name: 'Tareas', component: TasksView }];
 
 const router = createRouter({
   history: createWebHistory(),
